@@ -13,22 +13,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool f = true;
+  //Defining an boolean to specify if the user is willing to edit the text or not
+  bool f = false;
   var txt = TextEditingController();
   @override
   void initState() {
     super.initState();
+    //Calling to update my text in the textformfield every 1 second
+    //Only if the below conditions are satisfied
     Timer.periodic(
-      Duration(seconds: 1),
+      const Duration(seconds: 1),
       (timer) async {
-        if (!f) {
+        //Condition - If the user has tapped below button so that he can edit the text
+        if (f) {
           var res = await http.get(
             Uri.parse("https://collab-me-backend.vercel.app/latest/1"),
           );
           var data1 = await json.decode(res.body);
           var sample = txt.text;
           if ((data1["latest msg"]["text"].length != 0) &&
-              (txt.text != data1["latest msg"]["text"]),) {
+              (txt.text != data1["latest msg"]["text"])) {
             setState(
               () {
                 txt.text = data1["latest msg"]["text"];
@@ -75,7 +79,8 @@ class _HomePageState extends State<HomePage> {
                 print(response.body);
                 print("data uploaded");
               }
-
+              //Used to bring my editing cursor on the end of the text
+              //Used to fix an annoying bug :)
               txt.selection = TextSelection.collapsed(offset: txt.text.length);
             },
           ),
