@@ -20,15 +20,30 @@ class _HomePageState extends State<HomePage> {
     Timer.periodic(
       Duration(seconds: 5),
       (timer) async {
-        var data = {"text": txt.text};
-        final response = await http.post(
-          Uri.parse(
-            "https://collab-me-backend.vercel.app/update",
-          ),
-          body: json.encode(data),
-          headers: {"Content-Type": "application/json"},
+        if (txt.text.length != 0) {
+          var data = {"text": txt.text};
+          final response = await http.post(
+            Uri.parse(
+              "https://collab-me-backend.vercel.app/update",
+            ),
+            body: json.encode(data),
+            headers: {"Content-Type": "application/json"},
+          );
+        }
+
+        var res = await http.get(
+          Uri.parse("https://collab-me-backend.vercel.app/latest/1"),
         );
-        didUpdateWidget(HomePage());
+        var data1 = await json.decode(res.body);
+        var sample = txt.text;
+        if (data1["latest msg"]["text"].length != 0 &&
+            txt.text != data1["latest msg"]["text"]) {
+          setState(() {
+            txt.text = data1["latest msg"]["text"];
+          });
+        }
+
+        print(data1["latest msg"]["text"]);
         print("data uploaded");
       },
     );
@@ -60,18 +75,11 @@ class _HomePageState extends State<HomePage> {
               body: json.encode(data),
               headers: {"Content-Type": "application/json"},
             );
-            var res = await http.get(
-              Uri.parse("https://collab-me-backend.vercel.app/latest/1"),
-            );
-            var data1 = await json.decode(res.body);
-            setState(() {
-              txt.text = data1["latest msg"]["text"];
-            });
-            print(data1["latest msg"]["text"]);
+
             print(response.body);
           },
         ),
-        Text(txt.text),
+        // Text(txt.text),
       ]),
     );
   }
