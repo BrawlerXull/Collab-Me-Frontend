@@ -13,38 +13,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool f = true;
   var txt = TextEditingController();
   @override
   void initState() {
     super.initState();
     Timer.periodic(
-      Duration(seconds: 5),
+      Duration(seconds: 1),
       (timer) async {
-        if (txt.text.length != 0) {
-          var data = {"text": txt.text};
-          final response = await http.post(
-            Uri.parse(
-              "https://collab-me-backend.vercel.app/update",
-            ),
-            body: json.encode(data),
-            headers: {"Content-Type": "application/json"},
+        if (!f) {
+          var res = await http.get(
+            Uri.parse("https://collab-me-backend.vercel.app/latest/1"),
           );
+          var data1 = await json.decode(res.body);
+          var sample = txt.text;
+          if ((data1["latest msg"]["text"].length != 0) &&
+              (txt.text != data1["latest msg"]["text"]),) {
+            setState(
+              () {
+                txt.text = data1["latest msg"]["text"];
+              },
+            );
+          }
+          print(data1["latest msg"]["text"]);
         }
-        var res = await http.get(
-          Uri.parse("https://collab-me-backend.vercel.app/latest/1"),
-        );
-        var data1 = await json.decode(res.body);
-        var sample = txt.text;
-        if ((data1["latest msg"]["text"].length != 0) &&
-            (txt.text != data1["latest msg"]["text"])) {
-          setState(
-            () {
-              txt.text = data1["latest msg"]["text"];
-            },
-          );
-        }
-        print(data1["latest msg"]["text"]);
-        print("data uploaded");
       },
     );
   }
@@ -62,22 +54,29 @@ class _HomePageState extends State<HomePage> {
                   Uri.parse("https://collab-me-backend.vercel.app/latest/1"));
               var data = await json.decode(res.body);
               print(data["latest msg"]["text"]);
+              setState(() {
+                f = !f;
+              });
             },
-            child: null,
+            child: Text(f.toString()),
           ),
           TextField(
             controller: txt,
             onChanged: (value) async {
-              var data = {"text": txt.text};
-              final response = await http.post(
-                Uri.parse(
-                  "https://collab-me-backend.vercel.app/update",
-                ),
-                body: json.encode(data),
-                headers: {"Content-Type": "application/json"},
-              );
+              if (txt.text.length != 0) {
+                var data = {"text": txt.text};
+                final response = await http.post(
+                  Uri.parse(
+                    "https://collab-me-backend.vercel.app/update",
+                  ),
+                  body: json.encode(data),
+                  headers: {"Content-Type": "application/json"},
+                );
+                print(response.body);
+                print("data uploaded");
+              }
+
               txt.selection = TextSelection.collapsed(offset: txt.text.length);
-              print(response.body);
             },
           ),
           // Text(txt.text),
