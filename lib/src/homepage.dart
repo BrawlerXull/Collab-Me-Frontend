@@ -30,19 +30,19 @@ class _HomePageState extends State<HomePage> {
             headers: {"Content-Type": "application/json"},
           );
         }
-
         var res = await http.get(
           Uri.parse("https://collab-me-backend.vercel.app/latest/1"),
         );
         var data1 = await json.decode(res.body);
         var sample = txt.text;
-        if (data1["latest msg"]["text"].length != 0 &&
-            txt.text != data1["latest msg"]["text"]) {
-          setState(() {
-            txt.text = data1["latest msg"]["text"];
-          });
+        if ((data1["latest msg"]["text"].length != 0) &&
+            (txt.text != data1["latest msg"]["text"])) {
+          setState(
+            () {
+              txt.text = data1["latest msg"]["text"];
+            },
+          );
         }
-
         print(data1["latest msg"]["text"]);
         print("data uploaded");
       },
@@ -52,51 +52,37 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Collab Me"),
+        title: const Text("Collab Me"),
       ),
-      body: Column(children: [
-        ElevatedButton(
-          onPressed: () async {
-            var res = await http.get(
-                Uri.parse("https://collab-me-backend.vercel.app/latest/1"));
-            var data = await json.decode(res.body);
-            print(data["latest msg"]["text"]);
-          },
-          child: null,
-        ),
-        TextField(
-          controller: txt,
-          onChanged: (value) async {
-            var data = {"text": txt.text};
-            final response = await http.post(
-              Uri.parse(
-                "https://collab-me-backend.vercel.app/update",
-              ),
-              body: json.encode(data),
-              headers: {"Content-Type": "application/json"},
-            );
-
-            print(response.body);
-          },
-        ),
-        // Text(txt.text),
-      ]),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () async {
+              var res = await http.get(
+                  Uri.parse("https://collab-me-backend.vercel.app/latest/1"));
+              var data = await json.decode(res.body);
+              print(data["latest msg"]["text"]);
+            },
+            child: null,
+          ),
+          TextField(
+            controller: txt,
+            onChanged: (value) async {
+              var data = {"text": txt.text};
+              final response = await http.post(
+                Uri.parse(
+                  "https://collab-me-backend.vercel.app/update",
+                ),
+                body: json.encode(data),
+                headers: {"Content-Type": "application/json"},
+              );
+              txt.selection = TextSelection.collapsed(offset: txt.text.length);
+              print(response.body);
+            },
+          ),
+          // Text(txt.text),
+        ],
+      ),
     );
   }
 }
-
-
-
-// TextField(
-//           controller: txt,
-//           onChanged: (value) async {
-//             var data = {"text": "sixth text"};
-//             final response = await http.post(
-//                 Uri.parse(
-//                   "https://collab-me-backend.vercel.app/update",
-//                 ),
-//                 body: json.encode(data),
-//                 headers: {"Content-Type": "application/json"});
-//             print(response.body);
-//           },
-//         )
