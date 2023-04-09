@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
               },
             );
           }
+          print("Text Updated");
           print(data1["latest msg"]["text"]);
         }
       },
@@ -49,43 +50,91 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Collab Me"),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.purple, Colors.blue],
+            ),
+          ),
+        ),
       ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () async {
-              var res = await http.get(
-                  Uri.parse("https://collab-me-backend.vercel.app/latest/1"));
-              var data = await json.decode(res.body);
-              print(data["latest msg"]["text"]);
-              setState(() {
-                f = !f;
-              });
-            },
-            child: Text(f.toString()),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.purple, Colors.blue],
           ),
-          TextField(
-            controller: txt,
-            onChanged: (value) async {
-              if (txt.text.length != 0) {
-                var data = {"text": txt.text};
-                final response = await http.post(
-                  Uri.parse(
-                    "https://collab-me-backend.vercel.app/update",
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Do you want to turn on collaborative mode and update your text with others",
+                    style: TextStyle(color: Colors.white),
                   ),
-                  body: json.encode(data),
-                  headers: {"Content-Type": "application/json"},
-                );
-                print(response.body);
-                print("data uploaded");
-              }
-              //Used to bring my editing cursor on the end of the text
-              //Used to fix an annoying bug :)
-              txt.selection = TextSelection.collapsed(offset: txt.text.length);
-            },
-          ),
-          // Text(txt.text),
-        ],
+                ),
+                // ElevatedButton(
+                //   onPressed: () async {
+                //     var res = await http.get(Uri.parse(
+                //         "https://collab-me-backend.vercel.app/latest/1"));
+                //     var data = await json.decode(res.body);
+                //     print(data["latest msg"]["text"]);
+                //     setState(() {
+                //       f = !f;
+                //     });
+                //   },
+                //   child: Text(f.toString()),
+                // ),
+                Switch(
+                  value: f,
+                  focusColor: Colors.red,
+                  onChanged: (bool value) async {
+                    var res = await http.get(Uri.parse(
+                        "https://collab-me-backend.vercel.app/latest/1"));
+                    var data = await json.decode(res.body);
+                    print(data["latest msg"]["text"]);
+                    setState(() {
+                      f = value;
+                    });
+                  },
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+
+            TextField(
+              controller: txt,
+              maxLines: null,
+              decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  fillColor: Colors.white70,
+                  filled: true),
+              onChanged: (value) async {
+                if (txt.text.length != 0) {
+                  var data = {"text": txt.text};
+                  final response = await http.post(
+                    Uri.parse(
+                      "https://collab-me-backend.vercel.app/update",
+                    ),
+                    body: json.encode(data),
+                    headers: {"Content-Type": "application/json"},
+                  );
+                  print(response.body);
+                  print("data uploaded");
+                }
+                //Used to bring my editing cursor on the end of the text
+                //Used to fix an annoying bug :)
+                txt.selection =
+                    TextSelection.collapsed(offset: txt.text.length);
+              },
+            ),
+            // Text(txt.text),
+          ],
+        ),
       ),
     );
   }

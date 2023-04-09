@@ -1,6 +1,6 @@
 # Collabme
 
-## Realtime collaboration app
+## Realtime text collaboration app
 
 ### Tech Stacks used :
     1 - Flutter for Frontend
